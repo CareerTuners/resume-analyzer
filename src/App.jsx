@@ -18,10 +18,15 @@ function App() {
   }, []);
 
   const analyzeWithGPT = async () => {
-    if (!resumeText.trim() || !jobDescription.trim()) {
-      alert('Please upload a resume and enter a job description.');
+    if (!resumeText || resumeText.trim().length < 20) {
+      alert('Resume text is empty or too short. Please re-upload the file.');
       return;
     }
+    if (!jobDescription || jobDescription.trim().length < 20) {
+      alert('Job description is empty or too short. Please enter a valid one.');
+      return;
+    }
+    
 
     setLoading(true);
     setAnalysisResult('');
@@ -33,42 +38,17 @@ function App() {
     const trimmedJD = jobDescription.slice(0, maxJDLength);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://analyze-gpt.contact-cb5.workers.dev/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer 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', // replace with your actual API key
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: `
-You are a senior technical recruiter specializing in resume evaluation and job matching.
-
-Given a RESUME and a JOB DESCRIPTION, perform the following structured analysis:
-
-- Calculate a Similarity Score (0-100), weighted as: 60% skills, 30% experience, 10% education.
-- Match keywords AND synonyms.
-- Penalize -10% if core JD skills are missing.
-- Return matching keywords and missing keywords.
-- Suggest 3–5 actionable recommendations.
-
-Respond ONLY in structured JSON.
-
-RESUME: ${trimmedResume}
-JOB DESCRIPTION: ${trimmedJD}
-`,
-            },
-            {
-              role: 'user',
-              content: `Resume:\n${trimmedResume}\n\nJob Description:\n${trimmedJD}`,
-            },
-          ],
-          temperature: 0.2,
+          resume: trimmedResume,
+          jobDescription: trimmedJD,
         }),
       });
+
 
       const data = await response.json();
       console.log('Full GPT Response:', JSON.stringify(data, null, 2));
@@ -231,17 +211,40 @@ JOB DESCRIPTION: ${trimmedJD}
 
       {/* Saved Reports Section */}
       {savedReports.length > 0 && (
-        <div className="mt-16 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Previous Analyses</h2>
-          <div className="grid gap-4">
-            {savedReports.map((report) => (
-              <div key={report.id} className="bg-white p-4 rounded-lg shadow">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap">{report.content}</pre>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+  <div className="mt-16 max-w-4xl mx-auto">
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="text-2xl font-bold text-gray-800">Previous Analyses</h2>
+      <button
+        className="text-sm bg-red-600 text-white px-3 py-1 rounded"
+        onClick={() => {
+          localStorage.removeItem('resume_analysis_reports');
+          setSavedReports([]);
+        }}
+      >
+        Clear All
+      </button>
+    </div>
+
+    <div className="grid gap-4">
+      {savedReports.map((report) => {
+        try {
+          const result = JSON.parse(report.content);
+          return (
+            <div key={report.id} className="bg-white p-4 rounded-lg shadow text-sm">
+              <p className="mb-1"><strong>Score:</strong> {result.similarity_score}%</p>
+              <p className="mb-1"><strong>Matches:</strong> {result.matching_keywords.slice(0, 5).join(', ')}...</p>
+              <p className="mb-1"><strong>Missing:</strong> {result.missing_keywords.slice(0, 3).join(', ')}...</p>
+              <p><strong>Tips:</strong> {result.actionable_recommendations[0]}</p>
+            </div>
+          );
+        } catch {
+          return <pre key={report.id} className="bg-white p-4 rounded-lg shadow">{report.content}</pre>;
+        }
+      })}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
