@@ -1,7 +1,8 @@
 import React from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
+// ✅ Set GlobalWorkerOptions manually (even if it won't be used in dev)
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const ResumeUploader = ({ onTextExtracted }) => {
@@ -26,21 +27,27 @@ const ResumeUploader = ({ onTextExtracted }) => {
       return;
     }
 
-    onTextExtracted(text); // ✅ This must be called
+    console.log('Extracted Resume Text Length:', text.length);
+    onTextExtracted(text);
   };
 
   const extractTextFromPDF = async (file) => {
     const arrayBuffer = await file.arrayBuffer();
+    console.log('ArrayBuffer loaded:', arrayBuffer.byteLength);
+
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    console.log('PDF loaded:', pdf.numPages, 'pages');
 
     let fullText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const text = content.items.map((item) => item.str).join(' ');
-      fullText += text + '\n';
+      const pageText = content.items.map((item) => item.str).join(' ');
+      console.log(`Page ${i} text length:`, pageText.length);
+      fullText += pageText + '\n';
     }
 
+    console.log('Full extracted resume text length:', fullText.length);
     return fullText;
   };
 
