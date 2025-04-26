@@ -10,9 +10,26 @@ function App() {
   const [savedReports, setSavedReports] = useState([]);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('resume_analysis_reports')) || [];
-    setSavedReports(saved);
+    const savedReports = JSON.parse(localStorage.getItem('resume_analysis_reports')) || [];
+    setSavedReports(savedReports);
+  
+    // Load resume and JD from localStorage if available
+    const resumeFromStorage = localStorage.getItem('resume_text');
+    const jdFromStorage = localStorage.getItem('job_description');
+  
+    if (resumeFromStorage && jdFromStorage) {
+      setResumeText(resumeFromStorage);
+      setJobDescription(jdFromStorage);
+  
+      // Trigger automatic analysis
+      analyzeWithGPT();
+      
+      // (Optional) Clear them from storage after analysis starts
+      localStorage.removeItem('resume_text');
+      localStorage.removeItem('job_description');
+    }
   }, []);
+  
 
   const analyzeWithGPT = async () => {
     if (!resumeText || resumeText.trim().length < 20) {

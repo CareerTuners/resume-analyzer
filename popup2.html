@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Paste Job Description | Resume Analyzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="shared.js" defer></script>
+  <script>
+    function handleJDSubmit() {
+      const jdInput = document.getElementById('jobDescription');
+      const jdText = jdInput.value.trim();
+      if (!jdText) {
+        alert("Please paste the job description first.");
+        return;
+      }
+      localStorage.setItem('job_description', jdText);
+      redirectToAnalyzer(); // Move to analyzer
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-white flex flex-col items-center justify-center font-poppins px-4">
+
+  <div class="max-w-md w-full bg-[#DEE5EF] p-8 rounded-2xl shadow-2xl">
+    <h1 class="text-2xl font-bold text-center text-black mb-6">Paste Job Description</h1>
+    <textarea
+      id="jobDescription"
+      rows="6"
+      placeholder="Paste the job description here..."
+      class="block w-full text-sm text-black border border-gray-300 rounded-lg bg-white p-2 mb-6"
+    ></textarea>
+    <button
+      onclick="handleJDSubmit()"
+      class="w-full bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-lg transition"
+    >
+      Start Analysis →
+    </button>
+  </div>
+
+</body>
+</html>
