@@ -37,7 +37,7 @@ function App() {
       setAnalysisResult(data);
     } catch (error) {
       console.error('Analysis Error:', error);
-      setAnalysisResult('An error occurred. Please try again.');
+      setAnalysisResult(null);
     }
 
     setLoading(false);
@@ -49,64 +49,66 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-white font-poppins">
-      
+    <div className="flex min-h-screen font-poppins bg-[#F5F7FC]">
+
       {/* Sidebar */}
-      <div className="w-1/3 bg-[#F5F7FC] p-6 sticky top-0 h-screen overflow-y-auto">
-        {/* Score Summary */}
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Your Score</h2>
-          <div className="text-4xl font-bold text-center text-[#6184B3]">70%</div>
-          <p className="text-center mt-2 text-gray-600">23 Issues Found</p>
-        </div>
+      <aside className="w-1/3 p-6 sticky top-0 h-screen overflow-y-auto bg-[#F5F7FC] border-r border-gray-200">
+        <div className="space-y-6">
+          {/* Your Score */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">Your Score</h2>
+            <div className="text-center text-4xl font-bold text-[#6184B3]">{analysisResult?.overall_resume_score || '—'}%</div>
+            <p className="text-center text-gray-500 mt-2">{analysisResult ? `${analysisResult?.total_issues || 0} Issues Found` : ''}</p>
+          </div>
 
-        {/* Content Section */}
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6 border border-gray-200">
-          <h3 className="text-md font-bold text-gray-700 mb-2">Content</h3>
-          <p>Score: 72%</p>
-          <p className="text-green-600 text-sm">Strengths: Clear Achievements</p>
-          <p className="text-red-500 text-sm">Issues: Missing Keywords</p>
-        </div>
+          {/* Content */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-md font-bold text-gray-800 mb-2">Content</h3>
+            <p>Score: {analysisResult?.content_score || '—'}%</p>
+            <p className="text-green-600 text-sm mt-2">Strengths: {analysisResult?.content_strengths?.[0] || '—'}</p>
+            <p className="text-red-500 text-sm">Issues: {analysisResult?.content_issues?.[0] || '—'}</p>
+          </div>
 
-        {/* Format Section */}
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6 border border-gray-200">
-          <h3 className="text-md font-bold text-gray-700 mb-2">Format</h3>
-          <p>Score: 80%</p>
-          <p className="text-green-600 text-sm">Strengths: Clean Layout</p>
-          <p className="text-red-500 text-sm">Issues: Font Size Inconsistency</p>
-        </div>
+          {/* Format */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-md font-bold text-gray-800 mb-2">Format</h3>
+            <p>Score: {analysisResult?.format_score || '—'}%</p>
+            <p className="text-green-600 text-sm mt-2">Strengths: {analysisResult?.format_strengths?.[0] || '—'}</p>
+            <p className="text-red-500 text-sm">Issues: {analysisResult?.format_issues?.[0] || '—'}</p>
+          </div>
 
-        {/* Sections Section */}
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6 border border-gray-200">
-          <h3 className="text-md font-bold text-gray-700 mb-2">Sections</h3>
-          <p>Score: 68%</p>
-          <p className="text-green-600 text-sm">Present: Work History, Education</p>
-          <p className="text-red-500 text-sm">Missing: Skills Section</p>
-        </div>
+          {/* Sections */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-md font-bold text-gray-800 mb-2">Sections</h3>
+            <p>Score: {analysisResult?.sections_score || '—'}%</p>
+            <p className="text-green-600 text-sm mt-2">Present: {analysisResult?.present_sections?.join(', ') || '—'}</p>
+            <p className="text-red-500 text-sm">Missing: {analysisResult?.missing_sections?.join(', ') || '—'}</p>
+          </div>
 
-        {/* Design Section */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-          <h3 className="text-md font-bold text-gray-700 mb-2">Design</h3>
-          <p>Score: 75%</p>
-          <p className="text-green-600 text-sm">Strengths: Good Use of White Space</p>
+          {/* Design */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-md font-bold text-gray-800 mb-2">Design</h3>
+            <p>Score: {analysisResult?.design_score || '—'}%</p>
+            <p className="text-green-600 text-sm mt-2">Strengths: {analysisResult?.style_strengths?.[0] || '—'}</p>
+          </div>
         </div>
-      </div>
+      </aside>
 
       {/* Main Analysis Section */}
-      <div className="w-2/3 p-8 bg-white" id="analysis-section">
+      <main className="w-2/3 p-10 bg-white" id="analysis-section">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full animate-pulse">
-            <div className="text-2xl font-bold text-gray-500 mb-4">Analyzing Resume...</div>
+            <div className="text-2xl font-bold text-gray-400 mb-4">Analyzing Resume...</div>
             <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : analysisResult ? (
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Matched Keywords */}
-            <section className="bg-[#DEE5EF] p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold mb-4 text-black">Matched Keywords</h2>
+            <section className="bg-[#DEE5EF] p-6 rounded-2xl shadow-md">
+              <h2 className="text-xl font-bold text-black mb-4">Matched Keywords</h2>
               <div className="flex flex-wrap gap-2">
                 {analysisResult.matching_keywords?.map((kw, idx) => (
-                  <span key={idx} className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-lg">
+                  <span key={idx} className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
                     {kw}
                   </span>
                 ))}
@@ -114,11 +116,11 @@ function App() {
             </section>
 
             {/* Missing Keywords */}
-            <section className="bg-[#DEE5EF] p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold mb-4 text-black">Missing Keywords</h2>
+            <section className="bg-[#DEE5EF] p-6 rounded-2xl shadow-md">
+              <h2 className="text-xl font-bold text-black mb-4">Missing Keywords</h2>
               <div className="flex flex-wrap gap-2">
                 {analysisResult.missing_keywords?.map((kw, idx) => (
-                  <span key={idx} className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-lg">
+                  <span key={idx} className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">
                     {kw}
                   </span>
                 ))}
@@ -126,31 +128,31 @@ function App() {
             </section>
 
             {/* Actionable Tips */}
-            <section className="bg-[#DEE5EF] p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold mb-4 text-black">Actionable Recommendations</h2>
-              <ul className="list-disc pl-5 text-black">
+            <section className="bg-[#DEE5EF] p-6 rounded-2xl shadow-md">
+              <h2 className="text-xl font-bold text-black mb-4">Actionable Recommendations</h2>
+              <ul className="list-disc pl-5 space-y-2 text-black">
                 {analysisResult.actionable_recommendations?.map((tip, idx) => (
-                  <li key={idx} className="mb-2">{tip}</li>
+                  <li key={idx}>{tip}</li>
                 ))}
               </ul>
             </section>
 
-            {/* Download Report Button */}
-            <div className="text-center mt-8">
+            {/* Download Button */}
+            <div className="text-center">
               <button
                 onClick={handleDownloadPDF}
-                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition"
+                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition mt-6"
               >
                 Download Full Report
               </button>
             </div>
           </div>
         ) : (
-          <div className="text-gray-500 text-center mt-20">
+          <div className="flex flex-col justify-center items-center text-gray-400 mt-32">
             Upload a resume and job description to start analysis.
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
