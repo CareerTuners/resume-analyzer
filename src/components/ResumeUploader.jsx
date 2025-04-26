@@ -58,7 +58,7 @@ const ResumeUploader = ({ onTextExtracted }) => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto text-center p-4 border rounded-lg shadow">
+    <div className="w-full max-w-lg mx-auto text-center p-4 border shadow">
       <label className="block mb-2 font-semibold">Upload Resume (PDF or DOCX)</label>
       <input
         type="file"

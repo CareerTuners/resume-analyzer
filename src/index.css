@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Correct way: Direct CSS */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #F5F7FC;
+}
+
+/* Reset inputs, textarea, buttons */
+input, textarea, button {
+  padding: 0.75rem; /* equivalent to p-3 */
+  background-color: #f9fafb; /* equivalent to bg-gray-50 */
+  border-radius: 0.5rem; /* equivalent to rounded-lg */
+  border: 1px solid #d1d5db; /* equivalent to border-gray-300 */
+}
+
+/* Reset heading styles */
+h1, h2, h3 {
+  font-weight: 700; /* equivalent to font-bold */
+  color: #000000; /* equivalent to text-black */
+}
+
+/* Smooth button transitions */
+button {
+  transition-property: all;
+  transition-duration: 300ms;
+}

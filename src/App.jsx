@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen font-poppins bg-[#F5F7FC] p-6 gap-6">
+    <div className="flex min-h-screen font-sans bg-[#F5F7FC] p-6 gap-6">
 
       {/* Sidebar */}
       <aside className="w-1/3 flex flex-col gap-6">
@@ -62,7 +62,7 @@ function App() {
             type="file"
             accept=".pdf,.doc,.docx,.txt"
             onChange={handleResumeUpload}
-            className="w-full text-sm border border-gray-300 rounded-lg p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
@@ -73,12 +73,12 @@ function App() {
             rows="6"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            className="w-full text-sm border border-gray-300 rounded-lg p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
+            className="w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
             placeholder="Paste the job description here..."
           />
           <button
             onClick={analyzeWithGPT}
-            className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition w-full"
+            className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 w-full"
           >
             Start Analysis
           </button>
@@ -97,51 +97,34 @@ function App() {
         ) : analysisResult ? (
           <div className="space-y-10">
 
-            {/* Matched Keywords */}
-            <Section title="Matched Keywords">
-              {analysisResult.matched_keywords.map((kw, idx) => (
-                <Badge key={idx} text={kw} color="green" />
-              ))}
-            </Section>
+            {[
+              { title: "Matched Keywords", items: analysisResult.matched_keywords, badgeColor: "green" },
+              { title: "Matched Skills", items: analysisResult.matched_skills, badgeColor: "blue" },
+              { title: "Missing Keywords", items: analysisResult.missing_keywords, badgeColor: "red" },
+              { title: "Missing Skills", items: analysisResult.missing_skills, badgeColor: "yellow" },
+            ].map((section, idx) => (
+              <Section key={idx} title={section.title}>
+                <div className="flex flex-wrap gap-2">
+                  {section.items.map((item, i) => (
+                    <Badge key={i} text={item} color={section.badgeColor} />
+                  ))}
+                </div>
+              </Section>
+            ))}
 
-            {/* Matched Skills */}
-            <Section title="Matched Skills">
-              {analysisResult.matched_skills.map((skill, idx) => (
-                <Badge key={idx} text={skill} color="blue" />
-              ))}
-            </Section>
-
-            {/* Missing Keywords */}
-            <Section title="Missing Keywords">
-              {analysisResult.missing_keywords.map((kw, idx) => (
-                <Badge key={idx} text={kw} color="red" />
-              ))}
-            </Section>
-
-            {/* Missing Skills */}
-            <Section title="Missing Skills">
-              {analysisResult.missing_skills.map((skill, idx) => (
-                <Badge key={idx} text={skill} color="yellow" />
-              ))}
-            </Section>
-
-            {/* Content Structure */}
             <Section title="Content Structure">
               <p className="text-gray-800">{analysisResult.content_structure_comments}</p>
             </Section>
 
-            {/* Sections Analysis */}
             <Section title="Sections Analysis">
               <p className="text-green-700 mb-2">Present: {analysisResult.sections_analysis.present_sections.join(', ')}</p>
               <p className="text-red-600">Missing: {analysisResult.sections_analysis.missing_sections.join(', ')}</p>
             </Section>
 
-            {/* Communication Style */}
             <Section title="Communication Style">
               <p className="text-gray-800">{analysisResult.communication_style}</p>
             </Section>
 
-            {/* Final Recommendations */}
             <Section title="Final Recommendations">
               <ul className="list-disc pl-6 text-gray-800">
                 {analysisResult.recommendations.map((rec, idx) => (
@@ -150,11 +133,10 @@ function App() {
               </ul>
             </Section>
 
-            {/* Download PDF Button */}
-            <div className="text-center">
+            <div className="text-center mt-8">
               <button
                 onClick={handleDownloadPDF}
-                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition mt-8"
+                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-8 transition"
               >
                 Download Full Report
               </button>
@@ -172,7 +154,7 @@ function App() {
   );
 }
 
-// Reusable Section Component
+// Section Wrapper
 const Section = ({ title, children }) => (
   <section className="bg-[#DEE5EF] p-6 rounded-2xl shadow-md">
     <h2 className="text-xl font-bold text-black mb-4">{title}</h2>
@@ -180,7 +162,7 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-// Reusable Badge Component
+// Badge Component
 const Badge = ({ text, color }) => {
   const colors = {
     green: 'bg-green-100 text-green-800',
