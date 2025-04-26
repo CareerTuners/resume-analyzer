@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import html2pdf from 'html2pdf.js';
+import React, { useState } from "react";
+import html2pdf from "html2pdf.js";
 
 function App() {
   const [resumeFile, setResumeFile] = useState(null);
-  const [jobDescription, setJobDescription] = useState('');
+  const [jobDescription, setJobDescription] = useState("");
   const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,45 +50,45 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen font-sans bg-[#F5F7FC] p-6 gap-6">
+    <div className="flex min-h-screen font-sans bg-[#F5F7FC] p-8 gap-20">
 
       {/* Sidebar */}
-      <aside className="w-1/3 flex flex-col gap-6">
-
-        {/* Upload Resume Box */}
-        <div className="bg-white rounded-2xl p-6 shadow-md">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Upload Resume</h2>
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleResumeUpload}
-            className="w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+      <aside className="w-80 bg-[#DEE5EF] rounded-2xl p-6 flex flex-col gap-6 shadow-lg">
+        <div className="bg-white p-5 rounded-xl shadow-md">
+          <h2 className="text-lg font-bold mb-4 text-center">Upload Resume</h2>
+          <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleResumeUpload} className="w-full" />
         </div>
 
-        {/* Paste JD Box */}
-        <div className="bg-white rounded-2xl p-6 shadow-md flex flex-col">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Paste Job Description</h2>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-lg font-bold mb-4 text-center">Paste Job Description</h2>
           <textarea
-            rows="6"
+            rows="10"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            className="w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
-            placeholder="Paste the job description here..."
+            className="w-full resize-none"
+            placeholder="Paste JD here..."
           />
           <button
             onClick={analyzeWithGPT}
-            className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 w-full"
+            className="bg-[#6184B3] text-white font-bold py-2 px-6 mt-4 rounded-lg w-full hover:bg-blue-700 transition"
           >
             Start Analysis
           </button>
         </div>
 
+        {analysisResult && (
+          <div className="bg-white p-6 rounded-xl shadow-md text-center">
+            <h2 className="font-bold text-lg mb-2">Score</h2>
+            <div className="text-4xl font-extrabold text-[#6184B3]">
+              {analysisResult.similarity_score || 0}%
+            </div>
+            <div className="mt-2 text-gray-600 text-sm">Similarity Match</div>
+          </div>
+        )}
       </aside>
 
-      {/* Main Report Area */}
-      <main className="w-2/3 bg-white p-8 rounded-2xl shadow-lg overflow-y-auto" id="analysis-section">
-
+      {/* Main Panel */}
+      <main className="flex-1 bg-white rounded-2xl p-10 shadow-lg overflow-y-auto" id="analysis-section">
         {loading ? (
           <div className="flex flex-col justify-center items-center h-full animate-pulse">
             <div className="text-2xl font-bold text-gray-400 mb-4">Analyzing Resume...</div>
@@ -97,20 +97,21 @@ function App() {
         ) : analysisResult ? (
           <div className="space-y-10">
 
-            {[
-              { title: "Matched Keywords", items: analysisResult.matched_keywords, badgeColor: "green" },
-              { title: "Matched Skills", items: analysisResult.matched_skills, badgeColor: "blue" },
-              { title: "Missing Keywords", items: analysisResult.missing_keywords, badgeColor: "red" },
-              { title: "Missing Skills", items: analysisResult.missing_skills, badgeColor: "yellow" },
-            ].map((section, idx) => (
-              <Section key={idx} title={section.title}>
-                <div className="flex flex-wrap gap-2">
-                  {section.items.map((item, i) => (
-                    <Badge key={i} text={item} color={section.badgeColor} />
-                  ))}
-                </div>
-              </Section>
-            ))}
+            <Section title="Matched Keywords">
+              <BadgeList items={analysisResult.matched_keywords} color="green" />
+            </Section>
+
+            <Section title="Matched Skills">
+              <BadgeList items={analysisResult.matched_skills} color="blue" />
+            </Section>
+
+            <Section title="Missing Keywords">
+              <BadgeList items={analysisResult.missing_keywords} color="red" />
+            </Section>
+
+            <Section title="Missing Skills">
+              <BadgeList items={analysisResult.missing_skills} color="yellow" />
+            </Section>
 
             <Section title="Content Structure">
               <p className="text-gray-800">{analysisResult.content_structure_comments}</p>
@@ -136,7 +137,7 @@ function App() {
             <div className="text-center mt-8">
               <button
                 onClick={handleDownloadPDF}
-                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-8 transition"
+                className="bg-[#6184B3] hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition"
               >
                 Download Full Report
               </button>
@@ -149,31 +150,32 @@ function App() {
           </div>
         )}
       </main>
-
     </div>
   );
 }
 
-// Section Wrapper
 const Section = ({ title, children }) => (
-  <section className="bg-[#DEE5EF] p-6 rounded-2xl shadow-md">
-    <h2 className="text-xl font-bold text-black mb-4">{title}</h2>
+  <section className="bg-[#DEE5EF] p-6 rounded-xl shadow-md">
+    <h2 className="text-2xl font-bold text-black mb-6">{title}</h2>
     {children}
   </section>
 );
 
-// Badge Component
-const Badge = ({ text, color }) => {
+const BadgeList = ({ items, color }) => {
   const colors = {
     green: 'bg-green-100 text-green-800',
     red: 'bg-red-100 text-red-800',
     blue: 'bg-blue-100 text-blue-800',
-    yellow: 'bg-yellow-100 text-yellow-800'
+    yellow: 'bg-yellow-100 text-yellow-800',
   };
   return (
-    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colors[color]} mr-2 mb-2`}>
-      {text}
-    </span>
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, i) => (
+        <span key={i} className={`text-xs font-semibold px-3 py-1 rounded-full ${colors[color]} mr-2 mb-2`}>
+          {item}
+        </span>
+      ))}
+    </div>
   );
 };
 
