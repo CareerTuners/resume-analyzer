@@ -46,8 +46,6 @@ function App() {
       });
 
       const data = await response.json();
-      console.log('Full GPT Response:', JSON.stringify(data, null, 2));
-
       setAnalysisResult(data);
       saveReport(JSON.stringify(data));
 
@@ -87,19 +85,27 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-4">
-      <h1 className="text-4xl font-bold mb-10 text-blue-700 text-center">
-        Resume Analyzer 🚀
-      </h1>
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-white via-gray-50 to-gray-100 font-poppins">
+      
+      {/* Hero Section */}
+      <section className="w-full text-center py-16 px-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-4">
+          AI-Powered Resume Analyzer
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          Upload your resume, match it against your dream job, and get instant personalized feedback!
+        </p>
+      </section>
 
-      <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
+      {/* Upload Section */}
+      <div className="w-full max-w-2xl bg-white/70 backdrop-blur-md border border-gray-200 p-8 rounded-2xl shadow-xl mb-12">
         <ResumeUploader onTextExtracted={setResumeText} />
 
         <div className="mt-6">
-          <label className="block mb-2 font-semibold">Paste Job Description</label>
+          <label className="block mb-2 font-semibold text-gray-700">Paste Job Description</label>
           <textarea
             rows={6}
-            className="w-full p-3 border rounded-lg focus:outline-blue-400"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 transition"
             placeholder="Paste the target Job Description here..."
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
@@ -107,7 +113,9 @@ function App() {
         </div>
 
         <button
-          className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg mt-6 hover:bg-blue-700 transition"
+          className={`w-full mt-6 py-3 rounded-lg font-semibold text-white transition-all ${
+            loading ? 'bg-blue-400 animate-pulse cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
           onClick={analyzeWithGPT}
           disabled={loading}
         >
@@ -115,9 +123,9 @@ function App() {
         </button>
       </div>
 
-      {/* Analysis Result */}
+      {/* Analysis Result Section */}
       {analysisResult && typeof analysisResult === 'object' && (
-        <div id="analysis-report" className="mt-10 w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg text-left">
+        <div id="analysis-report" className="w-full max-w-4xl bg-white p-8 rounded-2xl shadow-xl mb-16 animate-fade-in-down">
           {(() => {
             try {
               let result = analysisResult;
@@ -135,10 +143,10 @@ function App() {
 
               return (
                 <>
-                  <div className="mb-8 text-center">
-                    <h2 className="text-3xl font-bold text-blue-700 mb-4">Similarity Score</h2>
-                    <div className="text-5xl font-bold mb-2">{result.similarity_score}%</div>
-                    <div className={`text-xl font-semibold ${color}`}>{label}</div>
+                  <div className="text-center mb-10">
+                    <h2 className="text-3xl font-bold text-blue-700 mb-2">Similarity Score</h2>
+                    <div className="text-5xl font-bold">{result.similarity_score}%</div>
+                    <div className={`text-lg font-semibold ${color}`}>{label}</div>
                     <div className="w-full bg-gray-300 h-3 rounded-full mt-4">
                       <div
                         className="bg-blue-500 h-3 rounded-full transition-all duration-700"
@@ -200,11 +208,11 @@ function App() {
 
       {/* Saved Reports Section */}
       {savedReports.length > 0 && (
-        <div className="mt-16 w-full max-w-4xl">
-          <div className="flex justify-between items-center mb-4">
+        <div className="w-full max-w-4xl mb-16">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Previous Analyses</h2>
             <button
-              className="text-sm bg-red-600 text-white px-3 py-1 rounded"
+              className="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
               onClick={() => {
                 localStorage.removeItem('resume_analysis_reports');
                 setSavedReports([]);
@@ -233,6 +241,12 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="py-6 text-sm text-gray-500">
+        Built with ❤️ by CareerTuners
+      </footer>
+
     </div>
   );
 }
